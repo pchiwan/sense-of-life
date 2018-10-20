@@ -6,15 +6,19 @@ describe('Game class', () => {
   let joystickMock
   let ledsMock
   let setPixelsMock
+  let showMessageMock
 
   beforeEach(() => {
     setPixelsMock = jest.fn()
+    showMessageMock = jest.fn((_, callback) => callback())
 
     joystickMock = {
       getJoystick: () => Promise.resolve({ on: () => {} })
     }
     ledsMock = {
-      setPixels: setPixelsMock
+      setPixels: setPixelsMock,
+      showMessage: showMessageMock,
+      sleep: () => {}
     }
     game = new Game(GRID_SIZE, joystickMock, ledsMock)
   })
@@ -87,12 +91,12 @@ describe('Game class', () => {
         expect(selectCellMock).toHaveBeenCalled()
       })
       test('calls gameStartConfirmation if clickCount is 1', () => {
-        const gameStartConfirmationMock = jest.fn()
-        game.gameStartConfirmation = gameStartConfirmationMock
+        const gameStartMessageMock = jest.fn()
+        game.gameStartMessage = gameStartMessageMock
 
         game.joystickPressHandler('click')
         game.joystickPressHandler('click')
-        expect(gameStartConfirmationMock).toHaveBeenCalled()
+        expect(gameStartMessageMock).toHaveBeenCalled()
       })
       test('calls startGame if clickCount is 1', () => {
         const startGameMock = jest.fn()
@@ -112,6 +116,24 @@ describe('Game class', () => {
       expect(setPixelsMock).toHaveBeenCalled()
       expect(setPixelsMock.mock.calls[0][0]).toBeInstanceOf(Array)
       expect(setPixelsMock.mock.calls[0][0].length).toEqual(GRID_SIZE * GRID_SIZE)
+    })
+  })
+
+  describe('loopMessage', () => {
+    describe('when a stopCondition function is not provided', () => {
+      test(`calls senseLeds's showMessage method only once`, () => {
+        game.loopMessage('foobar')
+        expect(showMessageMock).toHaveBeenCalledTimes(1)
+      })
+    })
+    describe('when a stopCondition function is provided', () => {
+      test(`calls senseLeds's showMessage method in loop until stopConditionFn returns true`, () => {
+        let counter = 0
+        const stopConditionFn = () => ++counter === 3
+
+        game.loopMessage('foobar', stopConditionFn)
+        expect(showMessageMock).toHaveBeenCalledTimes(3)
+      })
     })
   })
 })

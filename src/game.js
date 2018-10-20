@@ -1,5 +1,5 @@
 const Grid = require('./grid')
-const { flattenArray } = require('./utils')
+const { flattenArray, sleep } = require('./utils')
 const {
   COLOR_BLACK,
   COLOR_BLUE,
@@ -15,8 +15,8 @@ class Game {
     this.joystick = senseJoystick
     this.leds = senseLeds
 
-    this.resetGame()
     this.bindJoystick()
+    this.resetGame()
     this.paintGrid()
   }
 
@@ -61,7 +61,7 @@ class Game {
         this.selectCell()
         break
       case 1:
-        this.gameStartConfirmation()
+        this.gameStartMessage()
         break
       case 2:
         this.startGame()
@@ -105,10 +105,9 @@ class Game {
     this.displayCursor = false
     this.paintGrid()
 
-    setTimeout(() => {
-      this.displayCursor = true
-      this.paintGrid()
-    }, 200)
+    sleep(0.2)
+    this.displayCursor = true
+    this.paintGrid()
   }
 
   paintGrid () {
@@ -120,27 +119,12 @@ class Game {
             this.currentCoords.y === y) {
             return COLOR_WHITE
           }
-          return cell.alive ? COLOR_BLUE : COLOR_BLACK
+          return cell.alive
+            ? COLOR_BLUE
+            : COLOR_BLACK
         })
       )
     )
-  }
-
-  gameStartConfirmation () {
-    const _ = COLOR_BLACK
-    const X = COLOR_WHITE
-    const message = [
-      _, _, _, _, _, _, _, _,
-      _, _, _, _, _, _, _, _,
-      X, X, X, _, _, X, _, X,
-      X, _, X, _, _, X, X, _,
-      X, _, X, _, _, X, _, X,
-      X, X, X, _, _, X, _, X,
-      _, _, _, _, _, _, _, _,
-      _, _, _, _, _, _, _, _
-    ]
-
-    this.leds.setPixels(message)
   }
 
   startGame () {
@@ -152,9 +136,13 @@ class Game {
 
   stopGame () {
     clearInterval(this.interval)
-    setTimeout(() => {
-      this.gameOver()
-    }, 1000)
+    sleep(1)
+    this.gameOverMessage()
+    sleep(3)
+    this.loopMessage(
+      `${this.generations} generations`,
+      () => !this.gameStarted
+    )
   }
 
   gameLoop () {
@@ -181,7 +169,33 @@ class Game {
     }, INTERVAL_TIME)
   }
 
-  gameOver () {
+  loopMessage (message, stopConditionFn) {
+    this.leds.showMessage(message, () => {
+      if (stopConditionFn && !stopConditionFn()) {
+        this.loopMessage(message, stopConditionFn)
+      } else {
+        this.paintGrid()
+      }
+    })
+  }
+
+  gameStartMessage () {
+    const _ = COLOR_BLACK
+    const X = COLOR_WHITE
+    const message = [
+      _, _, _, _, _, _, _, _,
+      _, _, _, _, _, _, _, _,
+      X, X, X, _, _, X, _, X,
+      X, _, X, _, _, X, X, _,
+      X, _, X, _, _, X, _, X,
+      X, X, X, _, _, X, _, X,
+      _, _, _, _, _, _, _, _,
+      _, _, _, _, _, _, _, _
+    ]
+    this.leds.setPixels(message)
+  }
+
+  gameOverMessage () {
     const _ = COLOR_BLACK
     const X = COLOR_WHITE
     const message = [
@@ -194,7 +208,6 @@ class Game {
       _, _, _, _, _, _, _, _,
       _, _, _, _, _, _, _, _
     ]
-
     this.leds.setPixels(message)
   }
 }

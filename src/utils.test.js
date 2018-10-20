@@ -13,15 +13,15 @@ describe('createArray', () => {
       expect(createArray()).toEqual([])
     })
   })
-  describe('when callbackFn is not provided', () => {
+  describe('when callback function is not provided', () => {
     test('creates an empty array of given size', () => {
       const arr = createArray(GRID_SIZE)
       expect(arr.length).toEqual(GRID_SIZE)
       expect(arr.join('')).toEqual('')
     })
   })
-  describe('when callbackFn is provided', () => {
-    test('creates an array of given size and uses callbackFn to fill it', () => {
+  describe('when callback function is provided', () => {
+    test('creates an array of given size and uses callback function to fill it', () => {
       const arr = createArray(GRID_SIZE, () => 1)
       expect(arr.length).toEqual(GRID_SIZE)
       expect(arr.join('')).toEqual('1111')
@@ -35,7 +35,7 @@ describe('createGrid', () => {
       expect(createGrid()).toEqual([])
     })
   })
-  describe('when callbackFn is not provided', () => {
+  describe('when callback function is not provided', () => {
     test('creates an empty array of arrays of given size', () => {
       const grid = createGrid(GRID_SIZE)
       expect(grid.length).toEqual(GRID_SIZE)
@@ -43,8 +43,8 @@ describe('createGrid', () => {
       expect(flattenArray(grid).join('')).toEqual('')
     })
   })
-  describe('when callbackFn is provided', () => {
-    test('creates an array of arrays of given size and uses callbackFn to fill it', () => {
+  describe('when callback function is provided', () => {
+    test('creates an array of arrays of given size and uses callback function to fill it', () => {
       const grid = createGrid(GRID_SIZE, () => 1)
       expect(grid.length).toEqual(GRID_SIZE)
       grid.forEach(row => expect(row.length).toEqual(GRID_SIZE))
@@ -62,7 +62,7 @@ describe('flattenArray', () => {
 })
 
 describe('gridReducer', () => {
-  test('executes given callbackFn for every cell in the grid', () => {
+  test('executes given callback function for every cell in the grid', () => {
     const callbackFn = jest.fn()
     const grid = createGrid(GRID_SIZE, () => 0)
     gridReducer(grid, callbackFn)

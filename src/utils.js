@@ -27,9 +27,14 @@ const gridReducer = (grid, callbackFn = () => {}) => {
   })
 }
 
+const sleep = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout * 1000))
+}
+
 module.exports = {
   createArray,
   createGrid,
   flattenArray,
-  gridReducer
+  gridReducer,
+  sleep
 }
