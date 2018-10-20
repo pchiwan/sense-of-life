@@ -4,7 +4,7 @@
   "description": "Conway's game of life on a Sense HAT",
   "main": "src/app.js",
   "scripts": {
-    "test": "jest ./src"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

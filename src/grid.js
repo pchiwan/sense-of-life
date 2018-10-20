@@ -1,5 +1,9 @@
 const Cell = require('./cell')
-const { createArray } = require('./utils')
+const {
+  createGrid,
+  flattenArray,
+  gridReducer
+} = require('./utils')
 
 /**
  * The grid class
@@ -9,20 +13,18 @@ class Grid {
     this.grid = []
     this.gridSize = size
 
-    this.createGrid()
+    this.init()
   }
 
-  createGrid () {
-    this.grid = createArray(this.gridSize, () => (
-      createArray(this.gridSize, () => new Cell(false))
-    ))
+  init () {
+    this.grid = createGrid(this.gridSize, () => new Cell(false))
   }
 
   tick () {
     this.grid = this.newGeneration()
 
     return {
-      currentGrid: this.encode(),
+      stringValue: this.encode(),
       liveCells: this.findLiveCells()
     }
   }
@@ -31,29 +33,11 @@ class Grid {
     this.grid[i][j].live()
   }
 
-  reduceGrid (paintCallbackFn) {
-    return this.grid.map((row, rowIndex) => {
-      return row.map((cell, cellIndex) => {
-        return paintCallbackFn(cell.alive, rowIndex, cellIndex)
-      })
-    })
-  }
-
-  cloneGrid () {
-    return this.grid.map(row => {
-      return row.map(cell => new Cell(cell.alive))
-    })
-  }
-
   newGeneration () {
-    let newGrid = this.cloneGrid()
-    this.grid.forEach((row, i) => {
-      row.forEach((cell, j) => {
-        let liveNeighbours = this.checkNeighbours(i, j)
-        newGrid[i][j] = this.getNewCell(cell, liveNeighbours)
-      })
+    return gridReducer(this.grid, (cell, i, j) => {
+      let liveNeighbours = this.countLivingNeighbours(i, j)
+      return this.getNewCell(cell, liveNeighbours)
     })
-    return newGrid
   }
 
   findLiveCells () {
@@ -64,7 +48,7 @@ class Grid {
     }, 0)
   }
 
-  checkNeighbours (i, j) {
+  countLivingNeighbours (i, j) {
     let liveNeighbours = 0
     // check 8 neighbours clockwise
     liveNeighbours += this.checkNeighbour(this.getPrevIndex(i), this.getPrevIndex(j)) // top left cell
@@ -106,11 +90,17 @@ class Grid {
   }
 
   encode () {
-    return this.grid.map(
-      row => row.map(
-        cell => cell.alive ? 1 : 0
-      ).join('')
+    return flattenArray(
+      gridReducer(this.grid, cell => cell.alive ? 1 : 0)
     ).join('')
+  }
+
+  reduce (callbackFn) {
+    return gridReducer(this.grid, callbackFn)
+  }
+
+  load (grid) {
+    this.grid = gridReducer(grid, (cell, i, j) => new Cell(!!cell))
   }
 }
 
