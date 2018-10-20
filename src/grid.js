@@ -18,22 +18,6 @@ class Grid {
     ))
   }
 
-  // loadGrid (table) {
-  //   if (table.length !== this.grid.length) {
-  //     return
-  //   }
-
-  //   table.forEach((tr, x) => {
-  //     tr.forEach((td, y) => {
-  //       if (td) {
-  //         this.grid[x][y].live()
-  //       } else {
-  //         this.grid[x][y].die()
-  //       }
-  //     })
-  //   })
-  // }
-
   tick () {
     this.grid = this.newGeneration()
 
@@ -43,8 +27,8 @@ class Grid {
     }
   }
 
-  riseCell (x, y) {
-    this.grid[x][y].live()
+  riseCell (i, j) {
+    this.grid[i][j].live()
   }
 
   reduceGrid (paintCallbackFn) {
@@ -63,10 +47,10 @@ class Grid {
 
   newGeneration () {
     let newGrid = this.cloneGrid()
-    this.grid.forEach((row, x) => {
-      row.forEach((cell, y) => {
-        let liveNeighbours = this.checkNeighbours(x, y)
-        newGrid[x][y] = this.getNewCell(cell, liveNeighbours)
+    this.grid.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        let liveNeighbours = this.checkNeighbours(i, j)
+        newGrid[i][j] = this.getNewCell(cell, liveNeighbours)
       })
     })
     return newGrid
@@ -80,31 +64,31 @@ class Grid {
     }, 0)
   }
 
-  checkNeighbours (x, y) {
+  checkNeighbours (i, j) {
     let liveNeighbours = 0
     // check 8 neighbours clockwise
-    liveNeighbours += this.checkNeighbour(this.getPrevIndex(x), this.getPrevIndex(y)) // top left cell
-    liveNeighbours += this.checkNeighbour(x, this.getPrevIndex(y)) // top cell
-    liveNeighbours += this.checkNeighbour(this.getNextIndex(x), this.getPrevIndex(y)) // top right cell
-    liveNeighbours += this.checkNeighbour(this.getNextIndex(x), y) // right cell
-    liveNeighbours += this.checkNeighbour(this.getNextIndex(x), this.getNextIndex(y)) // bottom right cell
-    liveNeighbours += this.checkNeighbour(x, this.getNextIndex(y)) // bottom cell
-    liveNeighbours += this.checkNeighbour(this.getPrevIndex(x), this.getNextIndex(y)) // bottom left cell
-    liveNeighbours += this.checkNeighbour(this.getPrevIndex(x), y) // left cell
+    liveNeighbours += this.checkNeighbour(this.getPrevIndex(i), this.getPrevIndex(j)) // top left cell
+    liveNeighbours += this.checkNeighbour(i, this.getPrevIndex(j)) // top cell
+    liveNeighbours += this.checkNeighbour(this.getNextIndex(i), this.getPrevIndex(j)) // top right cell
+    liveNeighbours += this.checkNeighbour(this.getNextIndex(i), j) // right cell
+    liveNeighbours += this.checkNeighbour(this.getNextIndex(i), this.getNextIndex(j)) // bottom right cell
+    liveNeighbours += this.checkNeighbour(i, this.getNextIndex(j)) // bottom cell
+    liveNeighbours += this.checkNeighbour(this.getPrevIndex(i), this.getNextIndex(j)) // bottom left cell
+    liveNeighbours += this.checkNeighbour(this.getPrevIndex(i), j) // left cell
 
     return liveNeighbours
   }
 
-  checkNeighbour (x, y) {
-    return this.grid[x][y].alive ? 1 : 0
+  checkNeighbour (i, j) {
+    return this.grid[i][j].alive ? 1 : 0
   }
 
-  getPrevIndex (x) {
-    return x - 1 < 0 ? this.gridSize - 1 : x - 1
+  getPrevIndex (i) {
+    return i - 1 < 0 ? this.gridSize - 1 : i - 1
   }
 
-  getNextIndex (x) {
-    return x + 1 === this.gridSize ? 0 : x + 1
+  getNextIndex (i) {
+    return i + 1 === this.gridSize ? 0 : i + 1
   }
 
   getNewCell (cell, liveNeighbours) {

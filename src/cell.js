@@ -16,10 +16,12 @@ class Cell {
 
   die () {
     this.status = false
+    return this
   }
 
   live () {
     this.status = true
+    return this
   }
 }
 
