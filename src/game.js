@@ -8,9 +8,19 @@ const {
 } = require('./constants')
 
 const INTERVAL_TIME = 1000
+const LONG_PRESS_THRESHOLD = 3000
 
 class Game {
   constructor (senseJoystick, senseLeds) {
+    this.joystick = senseJoystick
+    this.leds = senseLeds
+
+    this.resetGame()
+    this.bindJoystick()
+    this.paintGrid()
+  }
+
+  resetGame () {
     this.g = new Grid(GRID_SIZE)
     this.currentCoords = { x: 0, y: 0 }
     this.generations = 0
@@ -18,12 +28,8 @@ class Game {
     this.interval = null
     this.clickTimes = 0
     this.prevGeneration = null
-
-    this.joystick = senseJoystick
-    this.leds = senseLeds
-
-    this.bindJoystick()
-    this.paintGrid()
+    this.pressStartTime = null
+    this.gameStarted = false
   }
 
   moveCursor (direction) {
@@ -62,13 +68,25 @@ class Game {
 
   bindJoystick () {
     this.joystick.getJoystick().then((joystick) => {
-      joystick.on('press', (val) => {
+      joystick.on('press', val => {
         if (val === 'click') {
-          this.clickHandler()
+          this.pressStartTime = new Date().getTime()
+          if (!this.gameStarted) {
+            this.clickHandler()
+          }
         } else {
           this.moveCursor(val)
           this.paintGrid()
           this.clickTimes = 0
+        }
+      })
+      joystick.on('release', val => {
+        if (val === 'click') {
+          // detect long press => reset game
+          const pressStopTime = new Date().getTime()
+          if (pressStopTime - this.pressStartTime >= LONG_PRESS_THRESHOLD) {
+            this.resetGame()
+          }
         }
       })
     })
@@ -120,6 +138,7 @@ class Game {
   startGame () {
     this.displayCursor = false
     this.generations = 0
+    this.gameStarted = true
     this.gameLoop()
   }
 
