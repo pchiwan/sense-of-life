@@ -34,7 +34,7 @@ describe('Grid class', () => {
     })
   })
 
-  describe('findLiveCells', () => {
+  describe('findAliveCells', () => {
     test('returns the count of live cells in the grid', () => {
       grid.load([
         [1, 1, 1, 1],
@@ -42,11 +42,11 @@ describe('Grid class', () => {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
       ])
-      expect(grid.findLiveCells()).toEqual(4)
+      expect(grid.findAliveCells()).toEqual(4)
     })
   })
 
-  describe('countLivingNeighbours', () => {
+  describe('countAliveNeighbours', () => {
     test('returns the number of living neighbours for a given grid cell', () => {
       grid.load([
         [1, 1, 1, 0],
@@ -54,8 +54,8 @@ describe('Grid class', () => {
         [1, 1, 1, 0],
         [0, 0, 0, 0]
       ])
-      expect(grid.countLivingNeighbours(0, 0)).toEqual(2)
-      expect(grid.countLivingNeighbours(1, 1)).toEqual(8)
+      expect(grid.countAliveNeighbours(0, 0)).toEqual(2)
+      expect(grid.countAliveNeighbours(1, 1)).toEqual(8)
     })
   })
 
@@ -74,24 +74,24 @@ describe('Grid class', () => {
     })
   })
 
-  describe('getNewCell', () => {
+  describe('getNextGenCell', () => {
     test('returns a dead cell when cell is alive and has less than 2 living neighbours', () => {
-      expect(grid.getNewCell(new Cell(true), 1).dead).toBeTruthy()
+      expect(grid.getNextGenCell(new Cell(true), 1).dead).toBeTruthy()
     })
     test('returns a dead cell when cell is alive and has more than 3 living neighbours', () => {
-      expect(grid.getNewCell(new Cell(true), 4).dead).toBeTruthy()
+      expect(grid.getNextGenCell(new Cell(true), 4).dead).toBeTruthy()
     })
     test('returns a live cell when is dead and has exactly 3 living neighbours', () => {
-      expect(grid.getNewCell(new Cell(), 3).alive).toBeTruthy()
+      expect(grid.getNextGenCell(new Cell(), 3).alive).toBeTruthy()
     })
     test('in other cases, returns exact same cell', () => {
       const aliveCell = new Cell(true)
       const deadCell = new Cell()
-      expect(grid.getNewCell(aliveCell, 2)).toBe(aliveCell)
-      expect(grid.getNewCell(aliveCell, 3)).toBe(aliveCell)
-      expect(grid.getNewCell(deadCell, 1)).toBe(deadCell)
-      expect(grid.getNewCell(deadCell, 2)).toBe(deadCell)
-      expect(grid.getNewCell(deadCell, 4)).toBe(deadCell)
+      expect(grid.getNextGenCell(aliveCell, 2)).toBe(aliveCell)
+      expect(grid.getNextGenCell(aliveCell, 3)).toBe(aliveCell)
+      expect(grid.getNextGenCell(deadCell, 1)).toBe(deadCell)
+      expect(grid.getNextGenCell(deadCell, 2)).toBe(deadCell)
+      expect(grid.getNextGenCell(deadCell, 4)).toBe(deadCell)
     })
   })
 })
