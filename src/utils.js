@@ -1,6 +1,6 @@
 const createArray = (size, callbackFn = () => {}) => {
   return size
-    ? [...new Array(size).keys()].map(callbackFn)
+    ? [...Array(size).fill()].map(callbackFn)
     : []
 }
 
