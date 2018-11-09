@@ -100,15 +100,14 @@ class Game {
     })
   }
 
-  selectCell () {
+  async selectCell () {
     this.grid.riseCell(this.currentCoords.x, this.currentCoords.y)
     this.displayCursor = false
     this.paintGrid()
 
-    sleep(0.2).then(() => {
-      this.displayCursor = true
-      this.paintGrid()
-    })
+    await sleep(0.2)
+    this.displayCursor = true
+    this.paintGrid()
   }
 
   paintGrid () {
@@ -135,15 +134,15 @@ class Game {
     this.gameLoop()
   }
 
-  stopGame () {
+  async stopGame () {
     clearInterval(this.interval)
-    sleep(1).then(this.gameOverMessage)
-    sleep(3).then(() => {
-      this.loopMessage(
-        `${this.generations} generations`,
-        () => !this.gameStarted
-      )
-    })
+    await sleep(1)
+    this.gameOverMessage()
+    await sleep(3)
+    this.loopMessage(
+      `${this.generations} generations`,
+      () => !this.gameStarted
+    )
   }
 
   gameLoop () {
@@ -171,7 +170,8 @@ class Game {
   }
 
   loopMessage (message, stopConditionFn) {
-    this.leds.showMessage(message, () => {
+    // this.leds.showMessage(message, undefined, undefined, undefined, () => {
+    this.leds.flashMessage(message, undefined, undefined, undefined, () => {
       if (stopConditionFn && !stopConditionFn()) {
         this.loopMessage(message, stopConditionFn)
       } else {
