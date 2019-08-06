@@ -89,6 +89,7 @@ class Game {
       const pressStopTime = this.getDateTime()
       if (pressStopTime - this.pressStartTime >= LONG_PRESS_THRESHOLD) {
         this.resetGame()
+        this.paintGrid()
       }
     }
   }
@@ -138,11 +139,16 @@ class Game {
     clearInterval(this.interval)
     await sleep(1)
     this.gameOverMessage()
-    await sleep(3)
-    this.loopMessage(
-      `${this.generations} generations`,
-      () => !this.gameStarted
-    )
+    await sleep(2)
+
+    const isPlural = this.generations > 1
+    const message = `${this.generations} ${isPlural ? 'generations' : 'generartion'}`
+    this.leds.showMessage(message, 0.07, undefined, undefined, () => {
+      this.leds.showMessage(message, 0.07, undefined, undefined, () => {
+        this.resetGame()
+        this.paintGrid()
+      })
+    })
   }
 
   gameLoop () {
@@ -167,17 +173,6 @@ class Game {
 
       this.prevGeneration = stringValue
     }, INTERVAL_TIME)
-  }
-
-  loopMessage (message, stopConditionFn) {
-    // this.leds.showMessage(message, undefined, undefined, undefined, () => {
-    this.leds.flashMessage(message, undefined, undefined, undefined, () => {
-      if (stopConditionFn && !stopConditionFn()) {
-        this.loopMessage(message, stopConditionFn)
-      } else {
-        this.paintGrid()
-      }
-    })
   }
 
   gameStartMessage () {
