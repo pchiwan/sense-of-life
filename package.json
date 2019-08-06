@@ -4,6 +4,7 @@
   "description": "Conway's game of life on a Sense HAT",
   "main": "src/app.js",
   "scripts": {
+    "webemu": "webemu start --file ./src/testApp.js --launch",
     "test": "jest"
   },
   "repository": {
